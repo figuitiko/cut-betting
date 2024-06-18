@@ -12,3 +12,54 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum RoleCB {
+  USER
+  ADMIN
+}
+
+model UserCB {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role    RoleCB   @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt  
+  bets      BetCB[]
+}
+
+model BetCB {
+  id        String   @id @default(cuid())
+  userCB      UserCB   @relation(fields: [userCBId], references: [id])
+  userCBId    String
+  gameCBId   String
+  gameCB      GameCB   @relation(fields: [gameCBId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model GameCB {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bets      BetCB[]
+  isDraw    Boolean
+  teamACBId String
+  teamACB   TeamCB   @relation(fields: [teamACBId], references: [id])
+  tornamentCBId String
+  tornamentCB   TornamentCB   @relation(fields: [tornamentCBId], references: [id])  
+}
+model TeamCB {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  games     GameCB[]
+}
+model TornamentCB {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  games     GameCB[]
+}
