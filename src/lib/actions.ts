@@ -126,7 +126,6 @@ export const addTeam = async (
   } catch (error) {
     console.error(error);
   }
-  revalidateTag("TeamCB");
 };
 
 const getterTeams = async (): Promise<TeamCB[]> => {
