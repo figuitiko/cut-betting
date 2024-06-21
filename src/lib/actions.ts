@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "./util";
 import { z } from "zod";
 import { GameCB, PlayerCB, TeamCB, TournamentCB } from "@prisma/client";
@@ -126,7 +126,7 @@ export const addTeam = async (
   } catch (error) {
     console.error(error);
   }
-  revalidatePath("/dashboard/team");
+  revalidateTag("TeamCB");
 };
 
 const getterTeams = async (): Promise<TeamCB[]> => {
@@ -143,6 +143,7 @@ export const getTeams = async (): Promise<TeamType[]> => {
     id: team.id,
     name: team.name,
   }));
+  revalidatePath("/dashboard/team");
   return result;
 };
 export const getTeamsWithId = async (): Promise<
