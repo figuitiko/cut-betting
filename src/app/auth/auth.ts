@@ -44,7 +44,7 @@ export const singUp = async (
       password: hashedPassword,
     },
   });
-  console.log(user);
+
   if (!user) {
     return {
       message: "An error occurred while creating your account.",
@@ -63,6 +63,7 @@ export const signIn = async (
     email: formData.get("email"),
     password: formData.get("password"),
   });
+
   const errorMessage = { message: "Invalid login credentials." };
 
   // If any form fields are invalid, return early
@@ -75,6 +76,7 @@ export const signIn = async (
   const user = await prisma.userCB.findUnique({
     where: { email: formData.get("email") as string },
   });
+
   // If user is not found, return early
   if (!user) {
     return errorMessage;
@@ -90,6 +92,7 @@ export const signIn = async (
   }
   // 4. If login successful, create a session for the user and redirect
   const userId = user.id.toString();
+
   await createSession(userId);
 };
 

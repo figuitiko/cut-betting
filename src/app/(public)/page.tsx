@@ -3,7 +3,7 @@ import LoginForm from "@/components/login-form";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      hello word
+      <h3>hello world</h3>
     </main>
   );
 }

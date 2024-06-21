@@ -4,8 +4,8 @@ import { logout } from "@/app/auth/auth";
 
 const LogOutButton = () => {
   return (
-    <button className="btn btn-accent" onClick={() => logout()}>
-      Accent
+    <button className="btn btn-outline" onClick={() => logout()}>
+      salir
     </button>
   );
 };

@@ -25,38 +25,52 @@ model UserCB {
   role    RoleCB   @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt  
+}
+model PlayerCB {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt  
   bets      BetCB[]
+  points    Int @default(0)
 }
 
 model BetCB {
   id        String   @id @default(cuid())
-  userCB      UserCB   @relation(fields: [userCBId], references: [id])
-  userCBId    String
+  playerCBId String
+  playerCB   PlayerCB   @relation(fields: [playerCBId], references: [id])
   gameCBId   String
   gameCB      GameCB   @relation(fields: [gameCBId], references: [id])
+  isDraw    Boolean
+  teamWinnerName String  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isWinner Boolean @default(false)
 }
 model GameCB {
-  id        String   @id @default(cuid())
-  name      String
+  id        String   @id @default(cuid())  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   bets      BetCB[]
-  isDraw    Boolean
+  isDraw    Boolean @default(false)
+  result    String  @default("")
+  teamWinnerName String @default("")
   teamACBId String
-  teamACB   TeamCB   @relation(fields: [teamACBId], references: [id])
+  teamACB   TeamCB   @relation("TeamA",fields: [teamACBId], references: [id])
+  teamBCBId String
+  teamBCB   TeamCB   @relation("TeamB",fields: [teamBCBId], references: [id])
   tornamentCBId String
-  tornamentCB   TornamentCB   @relation(fields: [tornamentCBId], references: [id])  
+  tornamentCB   TournamentCB   @relation(fields: [tornamentCBId], references: [id])  
 }
 model TeamCB {
   id        String   @id @default(cuid())
-  name      String
+  name      String  @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  games     GameCB[]
-}
-model TornamentCB {
+  updatedAt DateTime @updatedAt  
+  games     GameCB[] @relation("TeamB")
+  gamesAsTeamA GameCB[] @relation("TeamA")
+  }
+model TournamentCB {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())

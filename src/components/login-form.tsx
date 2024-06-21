@@ -4,7 +4,7 @@ import { signIn } from "@/app/auth/auth";
 import { useFormState, useFormStatus } from "react-dom";
 
 export default function LoginForm() {
-  const [errorMessage, dispatch] = useFormState(signIn, undefined);
+  const [state, dispatch] = useFormState(signIn, undefined);
 
   return (
     <form action={dispatch} className="space-y-3">
@@ -18,6 +18,9 @@ export default function LoginForm() {
           className="input w-full max-w-xs"
           required
         />
+        {state?.errors?.email && (
+          <p className="text-sm text-red-500">{state.errors.email}</p>
+        )}
       </div>
       <div>
         <label htmlFor="password">Password</label>
@@ -29,7 +32,13 @@ export default function LoginForm() {
           className="input w-full max-w-xs"
           required
         />
+        {state?.errors?.password && (
+          <p className="text-sm text-red-500">{state.errors.password}</p>
+        )}
       </div>
+      {state?.message && (
+        <p className="text-sm text-red-500">{state.message}</p>
+      )}
       <LoginButton />
       <div
         className="flex h-8 items-end space-x-1"
@@ -65,7 +74,10 @@ function LoginButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button className="mt-4 w-fit btn btn-primary" aria-disabled={pending}>
+    <button
+      className="mt-4 w-fit btn btn-outline btn-primary"
+      aria-disabled={pending}
+    >
       Log in
     </button>
   );
