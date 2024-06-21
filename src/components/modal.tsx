@@ -1,14 +1,23 @@
 "use client";
+import { cn } from "@/lib/util";
 import { useRef } from "react";
 
 const Modal = ({
   children,
   btnText = "Open Modal",
-}: Readonly<{ children: React.ReactNode; btnText?: string }>) => {
+  btnCls = "",
+}: Readonly<{
+  children: React.ReactNode;
+  btnText?: string;
+  btnCls?: string;
+}>) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   return (
     <div className="flex flex-col">
-      <button className="btn" onClick={() => modalRef?.current?.showModal()}>
+      <button
+        className={cn("btn", btnCls)}
+        onClick={() => modalRef?.current?.showModal()}
+      >
         {btnText}
       </button>
       <dialog ref={modalRef} id="my_modal_3" className="modal">

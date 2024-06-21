@@ -28,7 +28,7 @@ const BetsPage = async () => {
           <BetsForm
             games={games}
             players={players}
-            successMessage="juego agregado"
+            successMessage="Apuesta agregada"
             teams={teams}
           />
         </AddItem>
@@ -42,9 +42,9 @@ const BetsPage = async () => {
                 "jugador",
                 "juego",
                 "ganador",
-                "torneo",
                 "Fue Empate",
                 "Es ganadora",
+                "torneo",
               ]}
               updateFn={updateGame}
             />

@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx";
 
 export const prisma = new PrismaClient();
 
@@ -11,4 +13,8 @@ export const pathMapper = {
   "/dashboard/tournaments": "tournamentCB",
   "/dashboard/games": "gameCB",
   "/dashboard/bets": "betCB",
+};
+
+export const cn = (...inputs: ClassValue[]) => {
+  return twMerge(clsx(inputs));
 };

@@ -202,7 +202,7 @@ export const addGame = async (formData: FormData) => {
   revalidatePath("/dashboard/game");
 };
 
-type Games = GameCB & {
+export type Games = GameCB & {
   teamACB: { name: string };
   teamBCB: { name: string };
   tornamentCB: { name: string };
@@ -246,11 +246,42 @@ export const getGames = async (): Promise<any> => {
     id: game.id,
     teamA: game.teamACB.name,
     teamB: game.teamBCB.name,
-    tournament: game.tornamentCB.name,
     isDraw: game.isDraw,
     teamWinnerName: game.teamWinnerName,
     result: game.result,
+    tournament: game.tornamentCB.name,
   }));
+};
+
+export const getGameById = async (id: string): Promise<Games> => {
+  const game = await prisma.gameCB.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      teamACB: {
+        select: {
+          name: true,
+        },
+      },
+      teamBCB: {
+        select: {
+          name: true,
+        },
+      },
+      tornamentCB: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!game) {
+    throw new Error(`Game with ID ${id} not found.`);
+  }
+
+  return game;
 };
 // const updateGame = (
 //   state:

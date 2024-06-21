@@ -1,6 +1,6 @@
 "use client";
 import useToastForm from "@/hooks/useToastForm";
-import { addBet, addGame } from "@/lib/actions";
+import { addBet, getGameById } from "@/lib/actions";
 import { useEffect, useState } from "react";
 
 type BetsFormProps = {
@@ -12,6 +12,11 @@ type BetsFormProps = {
 const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
   const { formRef, setShowToast, showToast } = useToastForm();
   const [errorMsg, setErrorMsg] = useState("");
+  const [possibleWinners, setPossibleWinners] = useState<string[]>([]);
+  const handleWinner = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const game = await getGameById(e.target.value);
+    setPossibleWinners([game.teamACB.name, game.teamBCB.name]);
+  };
   useEffect(() => {
     if (errorMsg) {
       const timer = setTimeout(() => {
@@ -33,7 +38,12 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
       }}
     >
       <div className="flex flex-col gap-4">
-        <select name="game" className="select w-full max-w-xs" defaultValue="0">
+        <select
+          name="game"
+          className="select w-full max-w-xs"
+          defaultValue="0"
+          onChange={handleWinner}
+        >
           <option disabled value="0">
             Escoge juego
           </option>
@@ -50,12 +60,10 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
           className="select w-full max-w-xs"
           defaultValue="0"
         >
-          <option disabled value="0">
-            Escoge ganador
-          </option>
-          {teams.map((team, index) => (
-            <option key={index} value={team.name}>
-              {team.name}
+          <option value="0">Escoge ganador</option>
+          {possibleWinners.map((team, index) => (
+            <option key={index} value={team}>
+              {team}
             </option>
           ))}
         </select>

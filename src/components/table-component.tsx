@@ -3,6 +3,7 @@ import { PrismaMapper, deleteRecordById, updateGame } from "@/lib/actions";
 import { booleanToYesNo, pathMapper } from "@/lib/util";
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
+import Modal from "./modal";
 type RowEditable = {
   name: string;
   options?: Record<string, string>[];
@@ -108,23 +109,29 @@ const TableComponent = ({
                         {editMode ? "guardar" : "editar"}
                       </button>
                     )}
-
-                    <button
-                      className="btn btn-outline btn-error"
-                      onClick={() => {
-                        if ("id" in row) {
-                          deleteRecordById(
-                            row.id as string,
-                            pathname,
-                            pathMapper[
-                              pathname as keyof typeof pathMapper
-                            ] as PrismaMapper
-                          );
-                        }
-                      }}
-                    >
-                      eliminar
-                    </button>
+                    <Modal btnText="eliminar" btnCls="btn-outline  btn-error">
+                      <div className="flex flex-col gap-4 p-2">
+                        <kbd className="kbd kbd-md">
+                          Estas seguro q deseas eliminar este registro?
+                        </kbd>
+                        <button
+                          className="btn btn-outline  btn-error w-fit"
+                          onClick={() => {
+                            if ("id" in row) {
+                              deleteRecordById(
+                                row.id as string,
+                                pathname,
+                                pathMapper[
+                                  pathname as keyof typeof pathMapper
+                                ] as PrismaMapper
+                              );
+                            }
+                          }}
+                        >
+                          eliminar
+                        </button>
+                      </div>
+                    </Modal>
                   </div>
                 </td>
               </tr>
