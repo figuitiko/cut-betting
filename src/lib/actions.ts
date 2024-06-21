@@ -348,7 +348,12 @@ export const updateGame = async (
   }
   revalidatePath("/dashboard/game");
 };
-export type PrismaMapper = "playerCB" | "teamCB" | "tournamentCB" | "gameCB";
+export type PrismaMapper =
+  | "playerCB"
+  | "teamCB"
+  | "tournamentCB"
+  | "gameCB"
+  | "betCB";
 export const deleteRecordById = async (
   idRecord: string,
   path: string,
@@ -379,6 +384,13 @@ export const deleteRecordById = async (
         break;
       case "gameCB":
         await prisma.gameCB.delete({
+          where: {
+            id: idRecord,
+          },
+        });
+        break;
+      case "betCB":
+        await prisma.betCB.delete({
           where: {
             id: idRecord,
           },
@@ -427,6 +439,11 @@ export const getterBets = async () => {
               name: true,
             },
           },
+          tornamentCB: {
+            select: {
+              name: true,
+            },
+          },
           teamBCB: {
             select: {
               name: true,
@@ -449,6 +466,7 @@ export type BetsData = {
   game: string;
   teamWinnerName: string;
   isDraw: boolean;
+  tournament: string;
 };
 export const getBets = async (): Promise<BetsData[]> => {
   const data = await getterBets();
@@ -459,5 +477,6 @@ export const getBets = async (): Promise<BetsData[]> => {
     teamWinnerName: bet.teamWinnerName,
     isDraw: bet.isDraw,
     isWinner: bet.isWinner,
+    tournament: bet.gameCB.tornamentCB.name,
   }));
 };

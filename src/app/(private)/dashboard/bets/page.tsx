@@ -1,14 +1,10 @@
 import Await from "@/components/Await";
 import AddItem from "@/components/dashboard/add-item";
 import BetsForm from "@/components/dashboard/bets-form";
-import GamesForm from "@/components/dashboard/games-form";
-import Modal from "@/components/modal";
 import TableComponent, { Row } from "@/components/table-component";
 import {
   BetsData,
-  Player,
   getBets,
-  getGames,
   getGamesWithId,
   getPlayers,
   getTeamsWithId,
@@ -26,7 +22,7 @@ const BetsPage = async () => {
   return (
     <div className="flex flex-col">
       <div className="flex w-full justify-between">
-        <h1 className="text-4xl font-bold mb-4">Juegos</h1>
+        <h1 className="text-4xl font-bold mb-4">Apuestas</h1>
 
         <AddItem successMessage="Juego agregado" btnText="Agregar Apuesta">
           <BetsForm
@@ -46,6 +42,7 @@ const BetsPage = async () => {
                 "jugador",
                 "juego",
                 "ganador",
+                "torneo",
                 "Fue Empate",
                 "Es ganadora",
               ]}

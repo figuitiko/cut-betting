@@ -10,4 +10,5 @@ export const pathMapper = {
   "/dashboard/teams": "teamCB",
   "/dashboard/tournaments": "tournamentCB",
   "/dashboard/games": "gameCB",
+  "/dashboard/bets": "betCB",
 };
