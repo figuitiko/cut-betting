@@ -55,7 +55,7 @@ const FormItem = ({
               required
             />
           ))}
-          <SubmitBtn> {btnText} </SubmitBtn>
+          <SubmitBtn>{btnText} </SubmitBtn>
         </form>
 
         {showToast && (

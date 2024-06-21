@@ -21,9 +21,9 @@ const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
         <select
           name="teamA"
           className="select w-full max-w-xs"
-          defaultValue="0"
+          defaultValue="N/A"
         >
-          <option disabled value="0">
+          <option disabled value="N/A">
             Escoge equipo A
           </option>
           {teams.map((team, index) => (
@@ -37,9 +37,9 @@ const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
         <select
           name="teamB"
           className="select w-full max-w-xs"
-          defaultValue="1"
+          defaultValue="N/A"
         >
-          <option disabled value="1">
+          <option disabled value="N/A">
             Escoge equipo B
           </option>
           {teams.map((team, index) => (
@@ -53,9 +53,9 @@ const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
         <select
           name="tournament"
           className="select w-full max-w-xs"
-          defaultValue="3"
+          defaultValue="N/A"
         >
-          <option disabled value="3">
+          <option disabled value="N/A">
             Escoge Torneo
           </option>
           {tournaments.map((tournament, index) => (

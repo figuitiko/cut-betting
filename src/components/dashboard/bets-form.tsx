@@ -41,10 +41,10 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
         <select
           name="game"
           className="select w-full max-w-xs"
-          defaultValue="0"
+          defaultValue="N/A"
           onChange={handleWinner}
         >
-          <option disabled value="0">
+          <option disabled value="N/A">
             Escoge juego
           </option>
           {games.map((game, index) => (
@@ -58,9 +58,9 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
         <select
           name="teamWinnerName"
           className="select w-full max-w-xs"
-          defaultValue="0"
+          defaultValue="N/A"
         >
-          <option value="0">Escoge ganador</option>
+          <option value="N/A">Escoge ganador</option>
           {possibleWinners.map((team, index) => (
             <option key={index} value={team}>
               {team}
@@ -73,9 +73,9 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
         <select
           name="player"
           className="select w-full max-w-xs"
-          defaultValue="3"
+          defaultValue="N/A"
         >
-          <option disabled value="3">
+          <option disabled value="N/A">
             Escoge Jugador
           </option>
           {players.map((player, index) => (
@@ -89,9 +89,9 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
         <select
           name="isDraw"
           className="select w-full max-w-xs"
-          defaultValue="0"
+          defaultValue="N/A"
         >
-          <option disabled value="0">
+          <option disabled value="N/A">
             Fue empate?
           </option>
           <option value="si">Si</option>

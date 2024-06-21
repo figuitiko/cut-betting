@@ -91,9 +91,7 @@ const TableComponent = ({
                       ? getInputOrSelect(key, String(val))
                       : typeof val === "boolean"
                       ? booleanToYesNo(val)
-                      : key !== "id" && !!val
-                      ? String(val)
-                      : ""}
+                      : key !== "id" && String(!!val ? val : "N/A")}
                   </td>
                 ))}
                 <td>
