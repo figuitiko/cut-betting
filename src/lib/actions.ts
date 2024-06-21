@@ -11,10 +11,6 @@ const schemaPlayers = z.object({
     invalid_type_error: "Invalid Name",
     required_error: "Name is required",
   }),
-  points: z.number({
-    invalid_type_error: "Invalid Points",
-    required_error: "Points is required",
-  }),
 });
 
 export const addPlayer = async (
