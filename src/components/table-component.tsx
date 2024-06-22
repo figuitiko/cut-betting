@@ -4,12 +4,13 @@ import { booleanToYesNo, pathMapper } from "@/lib/util";
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Modal from "./modal";
+import { set } from "zod";
 type RowEditable = {
   name: string;
   options?: Record<string, string>[];
 };
 
-export type Row = Record<string, string | number>[];
+export type Row = Record<string, string | number> & { id: string }[];
 type TableComponentProps = {
   headingColumns: string[];
   rows: Row[];
@@ -26,27 +27,46 @@ const TableComponent = ({
   updateFn,
 }: TableComponentProps) => {
   const [editMode, setEditMode] = useState(false);
-  const [values, setValues] = useState<Record<string, string | number>>();
+  const [values, setValues] =
+    useState<Record<string, Record<string, string | number>>>();
   const pathname = usePathname();
   const isEditable = editableFields && editableFields.length > 0;
   const handleOnChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    rowKey: string | number
   ) => {
     const { name, value } = e.target;
-    setValues({ ...values, [name]: value });
+
+    setValues((prevValues) => ({
+      ...prevValues,
+      [rowKey]: { ...prevValues?.[rowKey], [name]: value },
+    }));
   };
-  const getInputOrSelect = (key: string, val: string) => {
-    const options = editableFields?.find((item) => item.name === key)?.options;
+  const getInputOrSelect = (key: string, val: string, row: Row) => {
+    val = val === "false" ? "No" : val;
+    val = val === "true" ? "Si" : val;
+    let options = editableFields?.find((item) => item.name === key)?.options;
+    if (pathname === "/dashboard/games" && key === "teamWinnerName") {
+      options = [
+        { name: row["teamA"] as string },
+        { name: row["teamB"] as string },
+      ];
+    }
+
     if (options) {
       return (
         <select
           name={key}
-          value={values?.[key] ?? String(val)}
-          onChange={handleOnChange}
+          value={
+            values?.[row.id]?.[key]
+              ? String(values?.[row.id]?.[key] ?? "")
+              : val
+          }
+          onChange={(e) => handleOnChange(e, row.id)}
         >
-          <option>seleciona</option>
-          {options.map((option) => (
-            <option key={option.id} value={option.name}>
+          <option>selecciona</option>
+          {options.map((option, idx) => (
+            <option key={idx} value={option.name}>
               {option.name}
             </option>
           ))}
@@ -57,8 +77,10 @@ const TableComponent = ({
       <input
         type="text"
         name={key}
-        value={values?.[key] ?? String(val)}
-        onChange={handleOnChange}
+        value={
+          values?.[row.id]?.[key] ? String(values?.[row.id]?.[key] ?? "") : val
+        }
+        onChange={(e) => handleOnChange(e, row.id)}
       />
     );
   };
@@ -88,7 +110,7 @@ const TableComponent = ({
                     {editMode &&
                     isEditable &&
                     editableFields?.map((item) => item.name).includes(key)
-                      ? getInputOrSelect(key, String(val))
+                      ? getInputOrSelect(key, String(val), row)
                       : typeof val === "boolean"
                       ? booleanToYesNo(val)
                       : key !== "id" && String(!!val ? val : "N/A")}
@@ -101,9 +123,10 @@ const TableComponent = ({
                         className="btn btn-outline"
                         onClick={async () => {
                           if (editMode && "id" in row && !!values && updateFn) {
-                            await updateFn(row.id as string, values);
+                            await updateFn(row.id as string, values[row.id]);
                           }
                           setEditMode(!editMode);
+                          setValues({});
                         }}
                       >
                         {editMode ? "guardar" : "editar"}

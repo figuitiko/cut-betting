@@ -296,12 +296,14 @@ export const updateGame = async (
   idRecord: string,
   data: Record<string, string | number | boolean>
 ) => {
+  console.log(data);
   if (data.isDraw === "Si") {
     data.teamWinnerName = "";
     data.isDraw = true;
   } else {
     data.isDraw = false;
   }
+  console.log(data);
   // all the bets where the game is
   // const bets = prisma.betCB.findMany({});
 
@@ -343,28 +345,28 @@ export const updateGame = async (
         },
       });
     }
-    const betsGroupByPlayer = await prisma.betCB.groupBy({
-      by: ["playerCBId"],
-      where: {
-        isWinner: true,
-      },
-      _count: {
-        isWinner: true,
-      },
-    });
+    // const betsGroupByPlayer = await prisma.betCB.groupBy({
+    //   by: ["playerCBId"],
+    //   where: {
+    //     isWinner: true,
+    //   },
+    //   _count: {
+    //     isWinner: true,
+    //   },
+    // });
 
-    await prisma.playerCB.updateMany({
-      where: {
-        id: {
-          in: betsGroupByPlayer.map((user) => user.playerCBId),
-        },
-      },
-      data: {
-        points: betsGroupByPlayer
-          .map((user) => user._count.isWinner)
-          .reduce((acc, curr) => acc + curr, 0),
-      },
-    });
+    // await prisma.playerCB.updateMany({
+    //   where: {
+    //     id: {
+    //       in: betsGroupByPlayer.map((user) => user.playerCBId),
+    //     },
+    //   },
+    //   data: {
+    //     points: betsGroupByPlayer
+    //       .map((user) => user._count.isWinner)
+    //       .reduce((acc, curr) => acc + curr, 0),
+    //   },
+    // });
 
     // console.log(usersCount);
 
@@ -439,7 +441,7 @@ export const addBet = async (formData: FormData) => {
   const teamWinnerName = formData.get("teamWinnerName");
   let isDraw = formData.get("isDraw");
   const player = formData.get("player");
-  isDraw = teamWinnerName ? "no" : "si";
+
   try {
     await prisma.betCB.create({
       data: {
@@ -450,7 +452,7 @@ export const addBet = async (formData: FormData) => {
           connect: { id: player as string },
         },
         teamWinnerName: teamWinnerName as string,
-        isDraw: isDraw === "si" ? true : false,
+        isDraw: isDraw === "si",
       },
     });
     revalidatePath("/dashboard/bets");
@@ -510,4 +512,215 @@ export const getBets = async (): Promise<BetsData[]> => {
     isWinner: bet.isWinner,
     tournament: bet.gameCB.tornamentCB.name,
   }));
+};
+export const getBetsByPlayerName = async (
+  player: string
+): Promise<BetsData[]> => {
+  const bets = await prisma.betCB.findMany({
+    where: {
+      playerCB: {
+        name: {
+          contains: player,
+          mode: "insensitive",
+        },
+      },
+    },
+    include: {
+      gameCB: {
+        select: {
+          teamACB: {
+            select: {
+              name: true,
+            },
+          },
+          tornamentCB: {
+            select: {
+              name: true,
+            },
+          },
+          teamBCB: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      playerCB: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  return bets.map((bet) => ({
+    id: bet.id,
+    player: bet.playerCB.name,
+    game: bet.gameCB.teamACB.name + " vs " + bet.gameCB.teamBCB.name,
+    teamWinnerName: bet.teamWinnerName,
+    isDraw: bet.isDraw,
+    isWinner: bet.isWinner,
+    tournament: bet.gameCB.tornamentCB.name,
+  }));
+};
+// get all the bets and group by player
+// get all the games and get the winner
+// compare the winner with the bet
+// if is the same add points to the player
+
+const basicPoints = [
+  {
+    id: "clxoodu2a0000m50p3j4lgr0v",
+    points: 7,
+  },
+  {
+    id: "clxkqkad40002poa7zide643i",
+    points: 10,
+  },
+  {
+    id: "clxkqct360001poa71gvhxocz",
+    points: 11,
+  },
+  {
+    id: "clxkomtw50000pjp63sdtg7kv",
+    points: 12,
+  },
+  {
+    id: "clxkr7zoe0007poa7wts38vys",
+    points: 10,
+  },
+  {
+    id: "clxp2ia160015m50pbu3iohsh",
+    points: 13,
+  },
+  {
+    id: "clxkqasrn0000poa7qn48350k",
+    points: 11,
+  },
+  {
+    id: "clxkqnbds0004poa7h1w45bhw",
+    points: 11,
+  },
+];
+export const setPoints = async () => {
+  try {
+    // const games = await getterGames();
+    // set the winner bets where the game is draw
+    await prisma.betCB.updateMany({
+      where: {
+        isWinner: true,
+      },
+      data: {
+        isWinner: false,
+      },
+    });
+    await prisma.gameCB.findMany({
+      where: {
+        isDraw: true,
+      },
+      include: {
+        bets: {
+          where: {
+            isDraw: true,
+          },
+        },
+      },
+    });
+    await prisma.betCB.updateMany({
+      where: {
+        AND: [
+          {
+            isDraw: true,
+          },
+          {
+            gameCB: {
+              isDraw: true,
+            },
+          },
+        ],
+      },
+      data: {
+        isWinner: true,
+      },
+    });
+    const betsWhereNotDraw = await prisma.betCB.findMany({
+      where: {
+        AND: [
+          {
+            isDraw: false,
+          },
+          {
+            gameCB: {
+              isDraw: false,
+            },
+          },
+        ],
+      },
+      include: {
+        gameCB: {
+          select: {
+            isDraw: true,
+            teamWinnerName: true,
+          },
+        },
+      },
+    });
+
+    betsWhereNotDraw.forEach(async (element) => {
+      if (element.teamWinnerName === element.gameCB.teamWinnerName) {
+        await prisma.betCB.update({
+          where: {
+            id: element.id,
+          },
+          data: {
+            isWinner: true,
+          },
+        });
+      }
+    });
+    const betsGroupByPlayer = await prisma.betCB.groupBy({
+      by: ["playerCBId"],
+      where: {
+        isWinner: true,
+      },
+      _count: {
+        isWinner: true,
+      },
+    });
+    await prisma.playerCB.updateMany({
+      data: {
+        points: 0,
+      },
+    });
+    await Promise.all(
+      basicPoints.map(async (element) => {
+        await prisma.playerCB.update({
+          where: {
+            id: element.id,
+          },
+          data: {
+            points: {
+              increment: element.points,
+            },
+          },
+        });
+      })
+    );
+    await Promise.all(
+      betsGroupByPlayer.map(async (user) => {
+        await prisma.playerCB.update({
+          where: {
+            id: user.playerCBId,
+          },
+          data: {
+            points: {
+              increment: Number(user._count.isWinner),
+            },
+          },
+        });
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    return "error setting points";
+  }
 };

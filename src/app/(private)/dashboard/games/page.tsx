@@ -36,10 +36,10 @@ const GamesPage = async () => {
               headingColumns={[
                 "Equipo 1",
                 "Equipo 2",
-                "Torneo",
                 "Fue Empate",
                 "Ganador",
                 "resultado",
+                "Torneo",
               ]}
               editableFields={[
                 { name: "teamWinnerName", options: teams },

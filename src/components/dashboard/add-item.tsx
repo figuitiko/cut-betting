@@ -15,7 +15,7 @@ type AddItemTypeWithChildren = {
 type AddItemProps = AddItemTypeWithChildren | AddItemTypeWithFormItems;
 
 const AddItem = (props: AddItemProps) => {
-  const { setShowToast, showToast } = useToastForm();
+  const { showToast } = useToastForm();
   if ("children" in props) {
     const { children, successMessage, btnText } = props;
     return (
