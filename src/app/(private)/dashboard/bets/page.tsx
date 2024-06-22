@@ -25,7 +25,6 @@ const BetsPage = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const player = searchParams?.player ?? "";
   if (player) {
     bets = getBetsByPlayerName(player);
-    console.log(await bets);
   }
 
   return (

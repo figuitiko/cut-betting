@@ -44,7 +44,11 @@ export type Player = {
   points: number;
 };
 const getterPlayers = async (): Promise<PlayerCB[]> => {
-  return await prisma.playerCB.findMany();
+  return await prisma.playerCB.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 };
 
 export const getPlayers = async (): Promise<Player[]> => {
@@ -489,6 +493,9 @@ export const getterBets = async () => {
           name: true,
         },
       },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 };
