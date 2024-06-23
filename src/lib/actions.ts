@@ -672,18 +672,21 @@ export const setPoints = async () => {
       },
     });
 
-    betsWhereNotDraw.forEach(async (element) => {
-      if (element.teamWinnerName === element.gameCB.teamWinnerName) {
-        await prisma.betCB.update({
-          where: {
-            id: element.id,
-          },
-          data: {
-            isWinner: true,
-          },
-        });
-      }
-    });
+    await Promise.allSettled(
+      betsWhereNotDraw.map(async (element) => {
+        if (element.teamWinnerName === element.gameCB.teamWinnerName) {
+          const result = await prisma.betCB.update({
+            where: {
+              id: element.id,
+            },
+            data: {
+              isWinner: true,
+            },
+          });
+          return result;
+        }
+      })
+    );
     const betsGroupByPlayer = await prisma.betCB.groupBy({
       by: ["playerCBId"],
       where: {
@@ -698,9 +701,9 @@ export const setPoints = async () => {
         points: 0,
       },
     });
-    await Promise.all(
+    await Promise.allSettled(
       basicPoints.map(async (element) => {
-        await prisma.playerCB.update({
+        const result = await prisma.playerCB.update({
           where: {
             id: element.id,
           },
@@ -710,11 +713,12 @@ export const setPoints = async () => {
             },
           },
         });
+        return result;
       })
     );
-    await Promise.all(
+    await Promise.allSettled(
       betsGroupByPlayer.map(async (user) => {
-        await prisma.playerCB.update({
+        const result = await prisma.playerCB.update({
           where: {
             id: user.playerCBId,
           },
@@ -724,10 +728,12 @@ export const setPoints = async () => {
             },
           },
         });
+        return result;
       })
     );
   } catch (error) {
     console.error(error);
     return "error setting points";
   }
+  revalidatePath("/dashboard/players");
 };
