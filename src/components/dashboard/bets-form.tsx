@@ -1,6 +1,7 @@
 "use client";
 import useToastForm from "@/hooks/useToastForm";
-import { addBet, getGameById } from "@/lib/actions";
+import { addBet, getGameById, getPlayerByName } from "@/lib/actions";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type BetsFormProps = {
@@ -9,13 +10,19 @@ type BetsFormProps = {
   teams: { name: string; id: string }[];
   successMessage: string;
 };
-const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
+const BetsForm = ({ games, players, successMessage }: BetsFormProps) => {
   const { formRef, setShowToast, showToast } = useToastForm();
   const [errorMsg, setErrorMsg] = useState("");
   const [possibleWinners, setPossibleWinners] = useState<string[]>([]);
   const [winner, setWinner] = useState<string>("");
   const [draw, setDraw] = useState<string>("");
-  console.log("draw", draw);
+  const searchParams = useSearchParams();
+  const player = searchParams.get("player");
+  const [playerFetched, setPlayerFetched] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
   const handleWinner = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const game = await getGameById(e.target.value);
     setPossibleWinners([game.teamACB.name, game.teamBCB.name]);
@@ -28,6 +35,20 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
       return () => clearTimeout(timer);
     }
   }, [errorMsg]);
+  useEffect(() => {
+    if (player) {
+      const fetchPlayerByName = async () => {
+        return await getPlayerByName(player);
+      };
+      fetchPlayerByName().then((data) => {
+        if (data) {
+          setPlayerFetched(data);
+        }
+      });
+    } else {
+      setPlayerFetched(null);
+    }
+  }, [player]);
   return (
     <form
       className="flex flex-col gap-8"
@@ -88,11 +109,15 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
           <option disabled value="N/A">
             Escoge Jugador
           </option>
-          {players.map((player, index) => (
-            <option key={index} value={player.id}>
-              {player.name}
-            </option>
-          ))}
+          {!playerFetched ? (
+            players.map((player, index) => (
+              <option key={index} value={player.id}>
+                {player.name}
+              </option>
+            ))
+          ) : (
+            <option value={playerFetched.id}>{playerFetched.name}</option>
+          )}
         </select>
       </div>
       <div className="flex flex-col gap-4 py-2 border-b-2">
@@ -101,7 +126,7 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
           name="isDraw"
           className="select select-bordered w-full max-w-xs"
           disabled={winner !== "" && winner !== "N/A"}
-          value={winner !== "" && winner !== "N/A" ? "no" : "N/A"}
+          // value={winner !== "" && winner !== "N/A" ? draw : "N/A"}
           onChange={(e) => setDraw(e.target.value)}
         >
           <option disabled value="N/A">

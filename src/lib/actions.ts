@@ -357,30 +357,6 @@ export const updateGame = async (
         },
       });
     }
-    // const betsGroupByPlayer = await prisma.betCB.groupBy({
-    //   by: ["playerCBId"],
-    //   where: {
-    //     isWinner: true,
-    //   },
-    //   _count: {
-    //     isWinner: true,
-    //   },
-    // });
-
-    // await prisma.playerCB.updateMany({
-    //   where: {
-    //     id: {
-    //       in: betsGroupByPlayer.map((user) => user.playerCBId),
-    //     },
-    //   },
-    //   data: {
-    //     points: betsGroupByPlayer
-    //       .map((user) => user._count.isWinner)
-    //       .reduce((acc, curr) => acc + curr, 0),
-    //   },
-    // });
-
-    // console.log(usersCount);
 
     await prisma.gameCB.update({
       where: {
@@ -392,6 +368,18 @@ export const updateGame = async (
     console.error(error);
   }
   revalidatePath("/dashboard/game");
+};
+export const getPlayerByName = async (
+  name: string
+): Promise<PlayerCB | null> => {
+  return await prisma.playerCB.findFirst({
+    where: {
+      name: {
+        contains: name,
+        mode: "insensitive",
+      },
+    },
+  });
 };
 export type PrismaMapper =
   | "playerCB"

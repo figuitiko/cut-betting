@@ -1,6 +1,7 @@
 "use client";
 import useToastForm from "@/hooks/useToastForm";
 import { addGame } from "@/lib/actions";
+import { useState } from "react";
 
 type GamesFormProps = {
   teams: { name: string; id: string }[];
@@ -9,50 +10,24 @@ type GamesFormProps = {
 };
 const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
   const { formRef, setShowToast, showToast } = useToastForm();
+  const [selectedTeamA, setSelectedTeamA] = useState("");
+  teams = teams.filter((team) => team.id !== selectedTeamA);
   return (
     <form
+      className="flex flex-col gap-8"
       action={async (formData) => {
         await addGame(formData);
         setShowToast(true);
         formRef.current?.reset();
       }}
     >
-      <div className="form-group">
-        <select
-          name="teamA"
-          className="select w-full max-w-xs"
-          defaultValue="N/A"
-        >
-          <option disabled value="N/A">
-            Escoge equipo A
-          </option>
-          {teams.map((team, index) => (
-            <option key={index} value={team.id}>
-              {team.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="form-group">
-        <select
-          name="teamB"
-          className="select w-full max-w-xs"
-          defaultValue="N/A"
-        >
-          <option disabled value="N/A">
-            Escoge equipo B
-          </option>
-          {teams.map((team, index) => (
-            <option key={index} value={team.id}>
-              {team.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="form-group">
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="tournament" className="w-fit">
+          escoge torneo
+        </label>
         <select
           name="tournament"
-          className="select w-full max-w-xs"
+          className="select select-bordered w-full max-w-xs"
           defaultValue="N/A"
         >
           <option disabled value="N/A">
@@ -65,6 +40,47 @@ const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
           ))}
         </select>
       </div>
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="teamA" className="w-fit">
+          Escoge equipo A
+        </label>
+        <select
+          name="teamA"
+          className="select select-bordered w-full max-w-xs"
+          defaultValue="N/A"
+          onChange={(e) => setSelectedTeamA(e.target.value)}
+        >
+          <option disabled value="N/A">
+            Escoge equipo A
+          </option>
+          {teams.map((team, index) => (
+            <option key={index} value={team.id}>
+              {team.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="teamB" className="w-fit">
+          Escoge equipo B
+        </label>
+        <select
+          disabled={selectedTeamA === ""}
+          name="teamB"
+          className="select select-bordered w-full max-w-xs"
+          defaultValue="N/A"
+        >
+          <option disabled value="N/A">
+            Escoge equipo B
+          </option>
+          {teams.map((team, index) => (
+            <option key={index} value={team.id}>
+              {team.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {showToast && (
         <div className="toast toast-success flex gap-4">
           <div className="alert alert-info">
