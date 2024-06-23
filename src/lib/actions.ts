@@ -46,7 +46,7 @@ export type Player = {
 const getterPlayers = async (): Promise<PlayerCB[]> => {
   return await prisma.playerCB.findMany({
     orderBy: {
-      createdAt: "desc",
+      points: "desc",
     },
   });
 };
