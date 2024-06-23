@@ -11,6 +11,8 @@ import {
 } from "@/lib/actions";
 import { Suspense } from "react";
 
+export const revalidate = 10;
+
 const GamesPage = async () => {
   const tournaments = await getTournamentsWithId();
   const teams = await getTeamsWithId();

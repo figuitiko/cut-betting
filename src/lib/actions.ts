@@ -133,7 +133,11 @@ export const addTeam = async (
 };
 
 const getterTeams = async (): Promise<TeamCB[]> => {
-  return await prisma.teamCB.findMany();
+  return await prisma.teamCB.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 };
 export type TeamType = {
   id: string;
@@ -142,6 +146,7 @@ export type TeamType = {
 
 export const getTeams = async (): Promise<TeamType[]> => {
   const data = await getterTeams();
+
   const result = data?.map((team) => ({
     id: team.id,
     name: team.name,
@@ -229,6 +234,9 @@ const getterGames = async (): Promise<Games[]> => {
           name: true,
         },
       },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 };
