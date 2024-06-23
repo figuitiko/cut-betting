@@ -29,7 +29,7 @@ const BetsPage = async ({ searchParams }: { searchParams: ISearchParams }) => {
 
   return (
     <div className="flex flex-col  max-h-screen">
-      <div className="flex w-full justify-between">
+      <div className="flex flex-col lg:flex-row w-full justify-between">
         <h1 className="text-4xl font-bold mb-4">Apuestas</h1>
         <div className="flex gap-4">
           <InputSearch query="player" placeholder="busca jugador" />
