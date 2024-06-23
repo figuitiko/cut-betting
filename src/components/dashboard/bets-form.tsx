@@ -13,6 +13,9 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
   const { formRef, setShowToast, showToast } = useToastForm();
   const [errorMsg, setErrorMsg] = useState("");
   const [possibleWinners, setPossibleWinners] = useState<string[]>([]);
+  const [winner, setWinner] = useState<string>("");
+  const [draw, setDraw] = useState<string>("");
+  console.log("draw", draw);
   const handleWinner = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const game = await getGameById(e.target.value);
     setPossibleWinners([game.teamACB.name, game.teamBCB.name]);
@@ -27,6 +30,7 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
   }, [errorMsg]);
   return (
     <form
+      className="flex flex-col gap-8"
       action={async (formData) => {
         const data = await addBet(formData);
         if (data) {
@@ -37,10 +41,13 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
         formRef.current?.reset();
       }}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="game" className="w-fit">
+          Escoge juego
+        </label>
         <select
           name="game"
-          className="select w-full max-w-xs"
+          className="select select-bordered w-full max-w-xs"
           defaultValue="N/A"
           onChange={handleWinner}
         >
@@ -54,11 +61,13 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
           ))}
         </select>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="teamWinnerName">Escoge ganador</label>
         <select
           name="teamWinnerName"
-          className="select w-full max-w-xs"
-          defaultValue="N/A"
+          className="select select-bordered w-full max-w-xs"
+          onChange={(e) => setWinner(e.target.value)}
+          disabled={draw !== "" && draw !== "N/A" && draw !== "no"}
         >
           <option value="N/A">Escoge ganador</option>
           {possibleWinners.map((team, index) => (
@@ -69,10 +78,11 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
         </select>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="jugador">Escoge Jugador</label>
         <select
           name="player"
-          className="select w-full max-w-xs"
+          className="select select-bordered w-full max-w-xs"
           defaultValue="N/A"
         >
           <option disabled value="N/A">
@@ -85,15 +95,19 @@ const BetsForm = ({ games, players, successMessage, teams }: BetsFormProps) => {
           ))}
         </select>
       </div>
-      <div>
+      <div className="flex flex-col gap-4 py-2 border-b-2">
+        <label htmlFor="isDraw">Fue empate?</label>
         <select
           name="isDraw"
-          className="select w-full max-w-xs"
-          defaultValue="N/A"
+          className="select select-bordered w-full max-w-xs"
+          disabled={winner !== "" && winner !== "N/A"}
+          value={winner !== "" && winner !== "N/A" ? "no" : "N/A"}
+          onChange={(e) => setDraw(e.target.value)}
         >
           <option disabled value="N/A">
             Fue empate?
           </option>
+
           <option value="si">Si</option>
           <option value="no">No</option>
         </select>
