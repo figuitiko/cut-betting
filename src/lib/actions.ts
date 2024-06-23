@@ -566,6 +566,9 @@ export const getBetsByPlayerName = async (
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
   return bets.map((bet) => ({
     id: bet.id,
