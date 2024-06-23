@@ -10,8 +10,7 @@ type GamesFormProps = {
 };
 const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
   const { formRef, setShowToast, showToast } = useToastForm();
-  const [selectedTeamA, setSelectedTeamA] = useState("");
-  teams = teams.filter((team) => team.id !== selectedTeamA);
+
   return (
     <form
       className="flex flex-col gap-8"
@@ -48,7 +47,6 @@ const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
           name="teamA"
           className="select select-bordered w-full max-w-xs"
           defaultValue="N/A"
-          onChange={(e) => setSelectedTeamA(e.target.value)}
         >
           <option disabled value="N/A">
             Escoge equipo A
@@ -65,7 +63,6 @@ const GamesForm = ({ teams, tournaments, successMessage }: GamesFormProps) => {
           Escoge equipo B
         </label>
         <select
-          disabled={selectedTeamA === ""}
           name="teamB"
           className="select select-bordered w-full max-w-xs"
           defaultValue="N/A"
