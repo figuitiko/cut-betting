@@ -42,9 +42,9 @@ const TournamentBetsPage = async () => {
       }
     >
       <div className="flex gap-4">
-        <InputSearch query="player" placeholder="busca jugador" />
-        <AddItem successMessage="Juego agregado" btnText="Agregar Apuesta">
-          <Suspense fallback={<div className="skeleton size-screen" />}>
+        <Suspense fallback={<div className="skeleton size-screen" />}>
+          <InputSearch query="player" placeholder="busca jugador" />
+          <AddItem successMessage="Juego agregado" btnText="Agregar Apuesta">
             <Await promise={data}>
               {([tournaments, players]) => (
                 <TournamentBetsForm
@@ -53,8 +53,8 @@ const TournamentBetsPage = async () => {
                 />
               )}
             </Await>
-          </Suspense>
-        </AddItem>
+          </AddItem>
+        </Suspense>
       </div>
     </PageWrapper>
   );
