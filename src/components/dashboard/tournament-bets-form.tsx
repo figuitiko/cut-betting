@@ -10,7 +10,6 @@ import {
 import { MAX_GROUPS_AMERICA, MAX_GROUPS_EURO } from "@/lib/config";
 import { useState } from "react";
 import SubmitBtn from "../submit-btn";
-import { set } from "zod";
 
 type TournamentBetsFormProps = {
   players: { name: string; id: string }[];
