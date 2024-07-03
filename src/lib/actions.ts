@@ -5,6 +5,10 @@ import { prisma } from "./util";
 import { z } from "zod";
 import { GameCB, PlayerCB, TeamCB, TournamentCB } from "@prisma/client";
 import { FormStateItems } from "@/components/dashboard/form-item";
+import { connect } from "http2";
+import TeamPage from "@/app/(private)/dashboard/teams/page";
+import { create } from "domain";
+import { teardownHeapProfiler } from "next/dist/build/swc";
 
 const schemaPlayers = z.object({
   name: z.string({
@@ -386,7 +390,8 @@ export type PrismaMapper =
   | "teamCB"
   | "tournamentCB"
   | "gameCB"
-  | "betCB";
+  | "betCB"
+  | "tournamentBetCB";
 export const deleteRecordById = async (
   idRecord: string,
   path: string,
@@ -424,6 +429,13 @@ export const deleteRecordById = async (
         break;
       case "betCB":
         await prisma.betCB.delete({
+          where: {
+            id: idRecord,
+          },
+        });
+        break;
+      case "tournamentBetCB":
+        await prisma.tournamentBetsCB.delete({
           where: {
             id: idRecord,
           },
@@ -735,4 +747,152 @@ export const setPoints = async () => {
     return "error setting points";
   }
   revalidatePath("/dashboard/players");
+};
+
+export const getTeamsByTournament = async (tournamentId: string) => {
+  return await prisma.teamCB.findMany({
+    where: {
+      tournamentId: tournamentId,
+    },
+  });
+};
+
+export const addTournamentBet = async (formData: FormData) => {
+  // console.log(formData);
+
+  const tournament = formData.get("tournament");
+  const player = formData.get("player");
+  const leadersGroup = formData.getAll("leadersGroup");
+  const scorer = formData.get("scorer");
+  const champion = formData.get("champion");
+  const scorerTeam = formData.get("scorerTeam");
+  console.log({ scorer });
+  console.log({ scorerTeam });
+  // return null;
+  const mapperLeadersGroup = leadersGroup.map((team) => ({
+    id: team,
+    isLeaderGroup: true,
+    isChampion: false,
+  }));
+  const allTeamsOnBets = [
+    ...mapperLeadersGroup,
+    { id: champion as string, isLeaderGroup: false, isChampion: true },
+  ];
+  const regex = /^[a-z0-9]{25}$/;
+  console.log("regex", regex.test(scorer as string));
+
+  const queryScorer = regex.test(scorer as string)
+    ? { connect: { id: scorer as string } }
+    : {
+        create: {
+          name: scorer as string,
+          teamCB: {
+            connect: { id: scorerTeam as string },
+          },
+          tournamentCB: {
+            connect: { id: tournament as string },
+          },
+        },
+      };
+
+  try {
+    await prisma.tournamentBetsCB.create({
+      data: {
+        tournamentCB: {
+          connect: { id: tournament as string },
+        },
+        playerCB: {
+          connect: { id: player as string },
+        },
+        tournamentBetsOnTeams: {
+          create: allTeamsOnBets.map(({ id, isLeaderGroup, isChampion }) => ({
+            teamCB: {
+              connect: { id: id as string },
+            },
+            isLeaderGroup,
+            isChampion,
+          })),
+        },
+        goalScorer: {
+          ...queryScorer,
+        },
+      },
+    });
+    revalidatePath("/dashboard/tournament-bets");
+  } catch (error) {
+    console.error(error);
+    return "error adding bet";
+  }
+};
+
+export type TournamentBets = {
+  scorer: string;
+  teamChampion: string | undefined;
+  teamsLeader: string[];
+  player: string;
+  tournament: string;
+};
+
+export const getTournamentBets = async (): Promise<TournamentBets[]> => {
+  const data = await prisma.tournamentBetsCB.findMany({
+    include: {
+      playerCB: {
+        select: {
+          name: true,
+        },
+      },
+      tournamentCB: {
+        select: {
+          name: true,
+        },
+      },
+      goalScorer: {
+        select: {
+          name: true,
+          teamCB: {
+            select: {
+              name: true,
+            },
+          },
+          tournamentCB: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      tournamentBetsOnTeams: {
+        include: {
+          teamCB: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  console.log({ data });
+
+  return data.map((bet) => ({
+    id: bet.id,
+    scorer: bet.goalScorer.name,
+    scorerTeam: bet.goalScorer.teamCB.name,
+    teamChampion: bet.tournamentBetsOnTeams.find((team) => team.isChampion)
+      ?.teamCB.name,
+    teamsLeader: bet.tournamentBetsOnTeams
+      .filter((team) => team.isLeaderGroup)
+      .map((team) => team.teamCB.name),
+    player: bet.playerCB.name,
+    tournament: bet.tournamentCB.name,
+    isWinner: bet.isWinner ? "Si" : "No",
+  }));
+};
+
+export const getScorerByTournament = async (tournamentId: string) => {
+  return await prisma.goalScorerCB.findMany({
+    where: {
+      tournamentCBId: tournamentId,
+    },
+  });
 };

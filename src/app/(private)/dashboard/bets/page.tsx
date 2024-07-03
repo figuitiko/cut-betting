@@ -2,6 +2,7 @@ import Await from "@/components/Await";
 import AddItem from "@/components/dashboard/add-item";
 import BetsForm from "@/components/dashboard/bets-form";
 import InputSearch from "@/components/dashboard/input-search";
+import PageWrapper from "@/components/dashboard/page-wrapper";
 import TableComponent, { Row } from "@/components/table-component";
 import {
   BetsData,
@@ -10,8 +11,6 @@ import {
   getGamesWithId,
   getPlayers,
   getTeamsWithId,
-  getTournamentsWithId,
-  updateGame,
 } from "@/lib/actions";
 import React, { Suspense } from "react";
 
@@ -28,22 +27,9 @@ const BetsPage = async ({ searchParams }: { searchParams: ISearchParams }) => {
   }
 
   return (
-    <div className="flex flex-col  max-h-screen">
-      <div className="flex flex-col lg:flex-row w-full justify-between">
-        <h1 className="text-4xl font-bold mb-4">Apuestas</h1>
-        <div className="flex gap-4">
-          <InputSearch query="player" placeholder="busca jugador" />
-          <AddItem successMessage="Juego agregado" btnText="Agregar Apuesta">
-            <BetsForm
-              games={games}
-              players={players}
-              successMessage="Apuesta agregada"
-              teams={teams}
-            />
-          </AddItem>
-        </div>
-      </div>
-      <Suspense fallback={<div className="skeleton size-screen" />}>
+    <PageWrapper
+      heading="Apuestas"
+      childrenInferior={
         <Await promise={bets}>
           {(data: BetsData[]) => (
             <TableComponent
@@ -59,8 +45,20 @@ const BetsPage = async ({ searchParams }: { searchParams: ISearchParams }) => {
             />
           )}
         </Await>
-      </Suspense>
-    </div>
+      }
+    >
+      <div className="flex gap-4">
+        <InputSearch query="player" placeholder="busca jugador" />
+        <AddItem btnText="Agregar Apuesta">
+          <BetsForm
+            games={games}
+            players={players}
+            successMessage="Apuesta agregada"
+            teams={teams}
+          />
+        </AddItem>
+      </div>
+    </PageWrapper>
   );
 };
 

@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 const Modal = ({
   children,
-  btnText = "Open Modal",
+  btnText = "Abre el Modal",
   btnCls = "",
 }: Readonly<{
   children: React.ReactNode;

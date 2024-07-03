@@ -7,7 +7,10 @@ const FirePointsBtn = () => {
     await setPoints();
   };
   return (
-    <button className="btn w-fit" onClick={handleSetPoints}>
+    <button
+      className="btn btn-accent btn-outline w-fit"
+      onClick={handleSetPoints}
+    >
       {" "}
       Setea los puntos
     </button>

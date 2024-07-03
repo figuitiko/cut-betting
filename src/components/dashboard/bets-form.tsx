@@ -1,8 +1,9 @@
 "use client";
+import usePlayerByParams from "@/hooks/usePlayerByParams";
 import useToastForm from "@/hooks/useToastForm";
-import { addBet, getGameById, getPlayerByName } from "@/lib/actions";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { addBet, getGameById } from "@/lib/actions";
+import { useState } from "react";
+import SubmitBtn from "../submit-btn";
 
 type BetsFormProps = {
   games: { name: string; id: string }[];
@@ -16,41 +17,16 @@ const BetsForm = ({ games, players, successMessage }: BetsFormProps) => {
   const [possibleWinners, setPossibleWinners] = useState<string[]>([]);
   const [winner, setWinner] = useState<string>("");
   const [draw, setDraw] = useState<string>("");
-  const searchParams = useSearchParams();
-  const player = searchParams.get("player");
-  const [playerFetched, setPlayerFetched] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
 
   const handleWinner = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const game = await getGameById(e.target.value);
     setPossibleWinners([game.teamACB.name, game.teamBCB.name]);
   };
-  useEffect(() => {
-    if (errorMsg) {
-      const timer = setTimeout(() => {
-        setErrorMsg("");
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMsg]);
-  useEffect(() => {
-    if (player) {
-      const fetchPlayerByName = async () => {
-        return await getPlayerByName(player);
-      };
-      fetchPlayerByName().then((data) => {
-        if (data) {
-          setPlayerFetched(data);
-        }
-      });
-    } else {
-      setPlayerFetched(null);
-    }
-  }, [player]);
+  const playerFetched = usePlayerByParams();
+
   return (
     <form
+      ref={formRef}
       className="flex flex-col gap-8"
       action={async (formData) => {
         const data = await addBet(formData);
@@ -126,7 +102,6 @@ const BetsForm = ({ games, players, successMessage }: BetsFormProps) => {
           name="isDraw"
           className="select select-bordered w-full max-w-xs"
           disabled={winner !== "" && winner !== "N/A"}
-          // value={winner !== "" && winner !== "N/A" ? draw : "N/A"}
           onChange={(e) => setDraw(e.target.value)}
         >
           <option disabled value="N/A">
@@ -153,8 +128,8 @@ const BetsForm = ({ games, players, successMessage }: BetsFormProps) => {
         </div>
       )}
 
-      <div className="form-group">
-        <button className="btn">Guardar</button>
+      <div className="flex">
+        <SubmitBtn>Guardar</SubmitBtn>
       </div>
     </form>
   );

@@ -33,6 +33,7 @@ model PlayerCB {
   updatedAt DateTime @updatedAt  
   bets      BetCB[]
   points    Int @default(0)
+  tournamentsBets TournamentBetsCB[]
 }
 
 model BetCB {
@@ -47,6 +48,41 @@ model BetCB {
   updatedAt DateTime @updatedAt
   isWinner Boolean @default(false)
 }
+model TournamentBetsCB {
+  id        String   @id @default(cuid())
+  playerCBId String
+  playerCB   PlayerCB   @relation(fields: [playerCBId], references: [id])    
+  tournamentBetsOnTeams TournamentBetsCBonTeam[]
+  tournamentCBId String
+  tournamentCB   TournamentCB   @relation(fields: [tournamentCBId], references: [id])
+  isWinner Boolean @default(false)  
+  goalScorerId String
+  goalScorer   GoalScorerCB   @relation(fields: [goalScorerId], references: [id])
+}
+
+model TournamentBetsCBonTeam {
+  id        String   @id @default(cuid())  
+  teamCBId String
+  teamCB   TeamCB   @relation(fields: [teamCBId], references: [id])
+  tournamentCBBetsId String
+  tournamentCBBets   TournamentBetsCB   @relation(fields: [tournamentCBBetsId], references: [id], onDelete: Cascade)
+  isChampion Boolean @default(false)
+  isLeaderGroup Boolean @default(false)  
+  }
+
+model GoalScorerCB {
+  id        String   @id @default(cuid())
+  name      String  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt    
+  amountGoals Int @default(0)
+  teamCBId String
+  teamCB   TeamCB   @relation(fields: [teamCBId], references: [id])
+  tournamentCBId String
+  tournamentCB   TournamentCB   @relation(fields: [tournamentCBId], references: [id])
+  tournamentBets TournamentBetsCB[]  
+  } 
+
 model GameCB {
   id        String   @id @default(cuid())  
   createdAt DateTime @default(now())
@@ -62,13 +98,20 @@ model GameCB {
   tornamentCBId String
   tornamentCB   TournamentCB   @relation(fields: [tornamentCBId], references: [id])  
 }
+
 model TeamCB {
   id        String   @id @default(cuid())
   name      String  @unique
+  isLeaderGroup Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt  
   games     GameCB[] @relation("TeamB")
-  gamesAsTeamA GameCB[] @relation("TeamA")
+  gamesAsTeamA GameCB[] @relation("TeamA")  
+  isChampion Boolean @default(false)
+  tournamentBets TournamentBetsCBonTeam[]
+  tournamentId String @default("clxkyr0hm0000shq1mkpypx56")
+  tournament   TournamentCB   @relation(fields: [tournamentId], references: [id])
+  goalScorers GoalScorerCB[]
   }
 model TournamentCB {
   id        String   @id @default(cuid())
@@ -76,4 +119,8 @@ model TournamentCB {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   games     GameCB[]
-}
+  tournamentBets TournamentBetsCB[]  
+  teams     TeamCB[]
+  goalScorers GoalScorerCB[]
+  groupAmount Int @default(0)
+  }

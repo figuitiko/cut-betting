@@ -10,6 +10,7 @@ import {
   updateGame,
 } from "@/lib/actions";
 import { Suspense } from "react";
+import PageWrapper from "@/components/dashboard/page-wrapper";
 
 export const revalidate = 10;
 
@@ -17,20 +18,11 @@ const GamesPage = async () => {
   const tournaments = await getTournamentsWithId();
   const teams = await getTeamsWithId();
   const games = getGames();
-  return (
-    <div className="flex flex-col">
-      <div className="flex w-full justify-between">
-        <h1 className="text-4xl font-bold mb-4">Juegos</h1>
 
-        <AddItem successMessage="Juego agregado" btnText="Agregar Juego">
-          <GamesForm
-            teams={teams}
-            tournaments={tournaments}
-            successMessage="juego agregado"
-          />
-        </AddItem>
-      </div>
-      <Suspense fallback={<div className="skeleton size-screen" />}>
+  return (
+    <PageWrapper
+      heading="juegos"
+      childrenInferior={
         <Await promise={games}>
           {(data: Player[]) => (
             <TableComponent
@@ -52,8 +44,16 @@ const GamesPage = async () => {
             />
           )}
         </Await>
-      </Suspense>
-    </div>
+      }
+    >
+      <AddItem successMessage="Juego agregado" btnText="Agregar Juego">
+        <GamesForm
+          teams={teams}
+          tournaments={tournaments}
+          successMessage="juego agregado"
+        />
+      </AddItem>
+    </PageWrapper>
   );
 };
 

@@ -8,7 +8,7 @@ import FormItem, { AddItemTypeWithFormItems } from "./form-item";
 type AddItemTypeWithChildren = {
   children: React.ReactNode;
 
-  successMessage: string;
+  successMessage?: string;
   btnText: string;
 };
 
@@ -38,8 +38,8 @@ const AddItem = (props: AddItemProps) => {
     <FormItem
       formItems={formItems}
       action={action}
-      successMessage={successMessage}
-      btnText={btnText}
+      successMessage={successMessage ?? "Item agregado"}
+      btnText={btnText ?? "Agregar"}
     />
   );
 };

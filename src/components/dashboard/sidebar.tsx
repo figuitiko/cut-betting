@@ -35,6 +35,9 @@ const Sidebar = () => {
             <Link href="/dashboard/bets">Apuestas</Link>
           </li>
           <li>
+            <Link href="/dashboard/tournament-bets">Apuestas del torneo</Link>
+          </li>
+          <li>
             <Link href="/dashboard/tournament">Torneos</Link>
           </li>
           <li>

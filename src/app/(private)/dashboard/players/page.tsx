@@ -4,24 +4,14 @@ import AddItem from "@/components/dashboard/add-item";
 
 import { Player, addPlayer, getPlayers } from "@/lib/actions";
 import { Suspense } from "react";
+import PageWrapper from "@/components/dashboard/page-wrapper";
 
 const PlayersPage = () => {
   const players = getPlayers();
   return (
-    <div className="flex flex-col">
-      <div className="flex w-full justify-between">
-        <h1 className="text-4xl font-bold mb-4">Jugadores</h1>
-
-        <AddItem
-          formItems={[
-            { name: "name", type: "text", placeholder: "agregar jugador" },
-          ]}
-          action={addPlayer}
-          successMessage="Jugador agregado"
-          btnText="Agregar jugador"
-        />
-      </div>
-      <Suspense fallback={<div className="skeleton size-screen" />}>
+    <PageWrapper
+      heading="Jugadores"
+      childrenInferior={
         <Await promise={players}>
           {(data: Player[]) => (
             <TableComponent
@@ -30,8 +20,17 @@ const PlayersPage = () => {
             />
           )}
         </Await>
-      </Suspense>
-    </div>
+      }
+    >
+      <AddItem
+        formItems={[
+          { name: "name", type: "text", placeholder: "agregar jugador" },
+        ]}
+        action={addPlayer}
+        successMessage="Jugador agregado"
+        btnText="Agregar jugador"
+      />
+    </PageWrapper>
   );
 };
 

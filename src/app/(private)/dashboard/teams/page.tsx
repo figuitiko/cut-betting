@@ -9,23 +9,14 @@ import {
   TeamType,
 } from "@/lib/actions";
 import React, { Suspense } from "react";
+import PageWrapper from "@/components/dashboard/page-wrapper";
 
 const TeamPage = () => {
   const teams = getTeamsWithId();
   return (
-    <div className="flex flex-col">
-      <div className="flex w-full justify-between">
-        <h1 className="text-4xl font-bold mb-4">Equipos</h1>
-        <AddItem
-          formItems={[
-            { name: "name", type: "text", placeholder: "agregar Equipo" },
-          ]}
-          action={addTeam}
-          successMessage="Equipo agregado"
-          btnText="agregar Equipo"
-        />
-      </div>
-      <Suspense fallback={<div className="skeleton size-screen" />}>
+    <PageWrapper
+      heading="Equipos"
+      childrenInferior={
         <Await promise={teams}>
           {(data: TeamType[]) => (
             <TableComponent
@@ -34,8 +25,17 @@ const TeamPage = () => {
             />
           )}
         </Await>
-      </Suspense>
-    </div>
+      }
+    >
+      <AddItem
+        formItems={[
+          { name: "name", type: "text", placeholder: "agregar Equipo" },
+        ]}
+        action={addTeam}
+        successMessage="Equipo agregado"
+        btnText="agregar Equipo"
+      />
+    </PageWrapper>
   );
 };
 
